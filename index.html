@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>SENSIX ISSAI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  color:#fff;
+  background:#000;
+  overflow-x:hidden;
+}
+
+/* BACKGROUND VIDEO FAKE */
+.bg{
+  position:fixed;
+  inset:0;
+  background:linear-gradient(-45deg,#ff0000,#000,#ff0000,#111);
+  background-size:400% 400%;
+  animation:bgmove 8s infinite linear;
+  z-index:-1;
+}
+@keyframes bgmove{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+
+/* SPLASH */
+#splash{
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+}
+.loader{
+  width:80%;
+  height:10px;
+  background:#222;
+  margin-top:20px;
+}
+.bar{
+  height:100%;
+  width:0;
+  background:#ff0000;
+  animation:load 3s forwards;
+}
+@keyframes load{to{width:100%}}
+
+.hidden{display:none}
+
+.container{padding:20px}
+.card{
+  background:rgba(0,0,0,.8);
+  border:2px solid red;
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:15px;
+}
+button,input,select{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:8px;
+  border:none;
+}
+button{
+  background:red;
+  color:white;
+  font-weight:bold;
+}
+h2,h3{text-align:center}
+</style>
+</head>
+
+<body>
+<div class="bg"></div>
+
+<!-- SPLASH -->
+<div id="splash">
+  <h1>SENSIX ISSAI</h1>
+  <p>MODE DEWA</p>
+  <div class="loader"><div class="bar"></div></div>
+</div>
+
+<!-- LOGIN -->
+<div id="login" class="container hidden">
+  <div class="card">
+    <h3>Login Admin</h3>
+    <input id="user" placeholder="Username">
+    <input id="pass" type="password" placeholder="Password">
+    <button onclick="login()">LOGIN</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="container hidden">
+  <h2>⚡ SENSIX ISSAI ⚡</h2>
+
+  <div class="card">
+    <h3>AI SENSITIVITY</h3>
+    <select id="hp">
+      <option value="low">HP Kentang</option>
+      <option value="mid">HP Menengah</option>
+      <option value="high">HP Gaming</option>
+    </select>
+    <select id="aim">
+      <option value="tap">Tap Shot</option>
+      <option value="drag">Drag Shot</option>
+    </select>
+    <button onclick="ai()">Generate</button>
+    <div id="hasil"></div>
+  </div>
+
+  <div class="card">
+    <h3>Add User</h3>
+    <input id="newuser" placeholder="Nama User">
+    <button onclick="addUser()">Tambah</button>
+    <ul id="list"></ul>
+  </div>
+
+  <div class="card">
+    <h3>Tournament Mode</h3>
+    <p>🔥 Rank lokal • Sistem poin • Leaderboard</p>
+  </div>
+
+  <button onclick="logout()">LOGOUT</button>
+</div>
+
+<script>
+/* SPLASH */
+setTimeout(()=>{
+  splash.classList.add("hidden");
+  login.classList.remove("hidden");
+},3000);
+
+/* LOGIN */
+function login(){
+  if(user.value==="admin" && pass.value==="sensix"){
+    login.classList.add("hidden");
+    app.classList.remove("hidden");
+    loadUser();
+  } else alert("Login gagal");
+}
+function logout(){location.reload()}
+
+/* AI */
+function ai(){
+  let base={
+    low:[95,90,80,70,50],
+    mid:[90,85,75,65,45],
+    high:[85,80,70,60,40]
+  };
+  let s=base[hp.value];
+  hasil.innerHTML=`
+  General:${s[0]}<br>
+  RedDot:${s[1]}<br>
+  2x:${s[2]}<br>
+  4x:${s[3]}<br>
+  AWM:${s[4]}<br>
+  Tutor:${aim.value==="drag"?"Drag pendek cepat":"Tap ringan"}
+  `;
+}
+
+/* USER SYSTEM */
+let users=JSON.parse(localStorage.getItem("users")||"[]");
+function addUser(){
+  users.push(newuser.value);
+  localStorage.setItem("users",JSON.stringify(users));
+  loadUser();
+}
+function del(i){
+  users.splice(i,1);
+  localStorage.setItem("users",JSON.stringify(users));
+  loadUser();
+}
+function loadUser(){
+  list.innerHTML="";
+  users.forEach((u,i)=>{
+    list.innerHTML+=`<li>${u} <button onclick="del(${i})">X</button></li>`;
+  });
+}
+
+/* PWA */
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js");
+}
+</script>
+</body>
+</html>
